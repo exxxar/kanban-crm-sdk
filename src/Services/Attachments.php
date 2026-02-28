@@ -13,12 +13,12 @@ class Attachments
 
     public function list(int $taskId)
     {
-        return $this->request('GET', "task/{$taskId}/attachments");
+        return $this->request('GET', "api/task/{$taskId}/attachments");
     }
 
     public function upload(int $taskId, array $files)
     {
-        return $this->request('POST', "task/{$taskId}/attachments", [
+        return $this->request('POST', "api/task/{$taskId}/attachments", [
             'multipart' => $this->prepareFiles($files)
         ]);
     }

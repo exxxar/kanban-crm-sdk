@@ -13,12 +13,12 @@ class Comments
 
     public function list(int $taskId)
     {
-        return $this->request('GET', "task/{$taskId}/comments");
+        return $this->request('GET', "api/task/{$taskId}/comments");
     }
 
     public function add(int $taskId, array $data)
     {
-        return $this->request('POST', "task/{$taskId}/comment", [
+        return $this->request('POST', "api/task/{$taskId}/comment", [
             'multipart' => $this->prepareMultipart($data)
         ]);
     }

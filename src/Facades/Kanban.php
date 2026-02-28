@@ -2,7 +2,7 @@
 
 namespace Exxxar\Kanban\Facades;
 
-use Alexey\Kanban\Services\KanbanClient;
+use Exxxar\Kanban\Services\KanbanClient;
 use Illuminate\Support\Facades\Facade;
 
 /**
@@ -17,7 +17,7 @@ class Kanban extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return \Alexey\Kanban\Services\KanbanClient::class;
+        return \Exxxar\Kanban\Services\KanbanClient::class;
     }
 
 
