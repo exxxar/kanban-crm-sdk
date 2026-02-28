@@ -13,17 +13,17 @@ class Boards
 
     public function get(string $uuid)
     {
-        return $this->request('GET', "api/boards/{$uuid}");
+        return $this->request('GET', "boards/{$uuid}");
     }
 
     public function list()
     {
-        return $this->request('GET', "api/boards");
+        return $this->request('GET', "boards");
     }
 
     public function applyTemplate(string $uuid, string $template)
     {
-        return $this->request('POST', "api/boards/{$uuid}/apply-template", [
+        return $this->request('POST', "boards/{$uuid}/apply-template", [
             'json' => ['template' => $template]
         ]);
     }

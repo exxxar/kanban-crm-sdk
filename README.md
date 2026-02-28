@@ -35,7 +35,6 @@ use Kanban;
 Создание задачи
 ```php
 $response = Kanban::tasks()->create([
-    'board_uuid' => '123e4567-e89b-12d3-a456-426614174000',
     'thread' => 1,
     'type' => 'order',
     'payload' => [
@@ -120,7 +119,6 @@ use Kanban;
 
 // Создать задачу
 Kanban::tasks()->create([
-    'board_uuid' => '123',
     'thread' => 1,
     'type' => 'order',
     'payload' => ['title' => 'Новая задача']
@@ -143,7 +141,7 @@ Kanban::attachments()->upload(55, [
 ```
 
 # Структура пакета
-Код
+
 ```
 kanban-laravel/
  ├── src/
