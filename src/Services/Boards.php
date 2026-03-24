@@ -5,33 +5,46 @@ namespace Exxxar\Kanban\Services;
 
 use GuzzleHttp\Client;
 
+use Exxxar\Kanban\DTO\BoardDto;
+
 class Boards
 {
     public function __construct(protected Client $http)
     {
     }
 
-    public function get(string $uuid)
+    public function get(string $uuid): BoardDto
     {
-        return $this->request('GET', "boards/{$uuid}");
+        $data = $this->request('GET', "boards/{$uuid}");
+
+        return BoardDto::fromArray($data);
     }
 
-    public function list()
+    /**
+     * @return BoardDto[]
+     */
+    public function list(): array
     {
-        return $this->request('GET', "boards");
+        $data = $this->request('GET', "boards");
+
+        return BoardDto::collection($data);
     }
 
-    public function applyTemplate(string $uuid, string $template)
+    public function applyTemplate(string $uuid, string $template): BoardDto
     {
-        return $this->request('POST', "boards/{$uuid}/apply-template", [
+        $data = $this->request('POST', "boards/{$uuid}/apply-template", [
             'json' => ['template' => $template]
         ]);
+
+        return BoardDto::fromArray($data);
     }
 
-    protected function request(string $method, string $uri, array $options = [])
+    protected function request(string $method, string $uri, array $options = []): array
     {
+        $response = $this->http->request($method, $uri, $options);
+
         return json_decode(
-            $this->http->request($method, $uri, $options)->getBody()->getContents(),
+            $response->getBody()->getContents(),
             true
         );
     }

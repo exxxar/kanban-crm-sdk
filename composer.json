@@ -14,7 +14,7 @@
                 "Exxxar\\Kanban\\KanbanServiceProvider"
             ],
             "aliases": {
-                "Kanban": "Exxxar\\Kanban\\Facades\\Kanban"
+                "Kanban": "KanbanTaskTypeEnum"
             }
         }
     },

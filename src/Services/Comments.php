@@ -5,22 +5,31 @@ namespace Exxxar\Kanban\Services;
 
 use GuzzleHttp\Client;
 
+use Exxxar\Kanban\DTO\TaskCommentDto;
+
 class Comments
 {
     public function __construct(protected Client $http)
     {
     }
 
-    public function list(int $taskId)
+    /**
+     * @return TaskCommentDto[]
+     */
+    public function list(int $taskId): array
     {
-        return $this->request('GET', "task/{$taskId}/comments");
+        $data = $this->request('GET', "task/{$taskId}/comments");
+
+        return TaskCommentDto::collection($data);
     }
 
-    public function add(int $taskId, array $data)
+    public function add(int $taskId, array $data): TaskCommentDto
     {
-        return $this->request('POST', "task/{$taskId}/comment", [
+        $response = $this->request('POST', "task/{$taskId}/comment", [
             'multipart' => $this->prepareMultipart($data)
         ]);
+
+        return TaskCommentDto::fromArray($response);
     }
 
     protected function prepareMultipart(array $data): array
@@ -41,7 +50,7 @@ class Comments
                 $multipart[] = [
                     'name' => 'files[]',
                     'contents' => fopen($file, 'r'),
-                    'filename' => basename($file)
+                    'filename' => basename($file),
                 ];
             }
         }
@@ -49,10 +58,12 @@ class Comments
         return $multipart;
     }
 
-    protected function request(string $method, string $uri, array $options = [])
+    protected function request(string $method, string $uri, array $options = []): array
     {
+        $response = $this->http->request($method, $uri, $options);
+
         return json_decode(
-            $this->http->request($method, $uri, $options)->getBody()->getContents(),
+            $response->getBody()->getContents(),
             true
         );
     }
