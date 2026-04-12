@@ -14,7 +14,7 @@ class TagDto
     public static function fromArray(array $data): self
     {
         return new self(
-            id: $data['id'],
+            id: $data['id']?? null,
             name: $data['name'],
             color: $data['color'] ?? null,
         );

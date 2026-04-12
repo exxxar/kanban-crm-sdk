@@ -20,7 +20,7 @@ class TaskCommentDto
     public static function fromArray(array $data): self
     {
         return new self(
-            id: $data['id'],
+            id: $data['id']?? null,
             task_id: $data['task_id'],
             author: $data['author'],
             text: $data['text'],

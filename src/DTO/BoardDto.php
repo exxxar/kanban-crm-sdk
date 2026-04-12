@@ -24,7 +24,7 @@ class BoardDto
     public static function fromArray(array $data): self
     {
         return new self(
-            id: $data['id'],
+            id: $data['id'] ?? null,
             uuid: $data['uuid'],
             title: $data['title'],
             description: $data['description'] ?? null,

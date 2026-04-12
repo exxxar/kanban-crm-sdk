@@ -31,7 +31,7 @@ class TaskDto
     public static function fromArray(array $data): self
     {
         return new self(
-            id: $data['id'],
+            id: $data['id']?? null,
             column_id: $data['column_id'] ?? null,
             title: $data['title'],
             description: $data['description'] ?? null,

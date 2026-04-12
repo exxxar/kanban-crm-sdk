@@ -14,7 +14,7 @@ class ColumnDto
     public static function fromArray(array $data): self
     {
         return new self(
-            id: $data['id'],
+            id: $data['id']?? null,
             board_id: $data['board_id'],
             title: $data['title'],
             position: $data['position'] ?? 0,
