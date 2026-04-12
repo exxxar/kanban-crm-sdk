@@ -1,14 +1,12 @@
 <?php
 
-
 namespace Exxxar\Kanban\Services;
 
-use GuzzleHttp\Client;
 use Exxxar\Kanban\DTO\AttachmentDto;
 
 class Attachments
 {
-    public function __construct(protected Client $http)
+    public function __construct(protected KanbanClient $client)
     {
     }
 
@@ -17,7 +15,7 @@ class Attachments
      */
     public function list(int $taskId): array
     {
-        $data = $this->request('GET', "task/{$taskId}/attachments");
+        $data = $this->client->request('GET', "task/{$taskId}/attachments");
 
         return AttachmentDto::collection($data);
     }
@@ -27,7 +25,7 @@ class Attachments
      */
     public function upload(int $taskId, array $files): array
     {
-        $data = $this->request('POST', "task/{$taskId}/attachments", [
+        $data = $this->client->request('POST', "task/{$taskId}/attachments", [
             'multipart' => $this->prepareFiles($files)
         ]);
 
@@ -47,15 +45,5 @@ class Attachments
         }
 
         return $multipart;
-    }
-
-    protected function request(string $method, string $uri, array $options = []): array
-    {
-        $response = $this->http->request($method, $uri, $options);
-
-        return json_decode(
-            $response->getBody()->getContents(),
-            true
-        );
     }
 }

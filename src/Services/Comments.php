@@ -1,15 +1,12 @@
 <?php
 
-
 namespace Exxxar\Kanban\Services;
-
-use GuzzleHttp\Client;
 
 use Exxxar\Kanban\DTO\TaskCommentDto;
 
 class Comments
 {
-    public function __construct(protected Client $http)
+    public function __construct(protected KanbanClient $client)
     {
     }
 
@@ -18,14 +15,14 @@ class Comments
      */
     public function list(int $taskId): array
     {
-        $data = $this->request('GET', "task/{$taskId}/comments");
+        $data = $this->client->request('GET', "task/{$taskId}/comments");
 
         return TaskCommentDto::collection($data);
     }
 
     public function add(int $taskId, array $data): TaskCommentDto
     {
-        $response = $this->request('POST', "task/{$taskId}/comment", [
+        $response = $this->client->request('POST', "task/{$taskId}/comment", [
             'multipart' => $this->prepareMultipart($data)
         ]);
 
@@ -56,15 +53,5 @@ class Comments
         }
 
         return $multipart;
-    }
-
-    protected function request(string $method, string $uri, array $options = []): array
-    {
-        $response = $this->http->request($method, $uri, $options);
-
-        return json_decode(
-            $response->getBody()->getContents(),
-            true
-        );
     }
 }

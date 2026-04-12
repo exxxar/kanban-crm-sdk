@@ -6,17 +6,20 @@ use Exxxar\Kanban\DTO\AttachmentDto;
 use Exxxar\Kanban\DTO\MessageDto;
 use Exxxar\Kanban\DTO\TaskCommentDto;
 use Exxxar\Kanban\DTO\TaskDto;
-use GuzzleHttp\Client;
 
 class Tasks
 {
-    public function __construct(protected Client $http)
+    public function __construct(protected KanbanClient $client)
     {
     }
 
     public function create(array $data): TaskDto
     {
-        return TaskDto::fromArray($this->http->post('task/create', ['json' => $data])->json());
+        $response = $this->client->request('POST', 'task/create', [
+            'json' => $data
+        ]);
+
+        return TaskDto::fromArray($response);
     }
 
     /**
@@ -24,50 +27,58 @@ class Tasks
      */
     public function getTasks(): array
     {
-        $data = $this->http->get('/tasks')->json();
+        $data = $this->client->request('GET', 'tasks');
 
         return array_map(
-            fn($item) => TaskDto::fromArray($item),
+            fn ($item) => TaskDto::fromArray($item),
             $data
         );
     }
 
     public function getTask(int $taskId): TaskDto
     {
-        $content = $this->http->get("task/$taskId")->json();
+        $data = $this->client->request('GET', "task/{$taskId}");
 
-        return TaskDto::fromArray($content);
+        return TaskDto::fromArray($data);
     }
 
-    public function comments($taskId): array
+    public function comments(int $taskId): array
     {
-        $data = $this->http->get("task/$taskId/comments")->json();
+        $data = $this->client->request('GET', "task/{$taskId}/comments");
 
         return TaskCommentDto::collection($data);
     }
 
-    public function addComment($taskId, array $data): TaskCommentDto
+    public function addComment(int $taskId, array $data): TaskCommentDto
     {
-        return TaskCommentDto::fromArray($this->http->post("task/$taskId/comment", ['multipart' => $data])->json());
+        $response = $this->client->request('POST', "task/{$taskId}/comment", [
+            'multipart' => $this->prepareMultipart($data)
+        ]);
+
+        return TaskCommentDto::fromArray($response);
     }
 
-    public function attachments($taskId): array
+    public function attachments(int $taskId): array
     {
-        $data = $this->http->get("task/$taskId/attachments")->json();
+        $data = $this->client->request('GET', "task/{$taskId}/attachments");
+
         return AttachmentDto::collection($data);
     }
 
-    public function uploadAttachments($taskId, array $files): AttachmentDto
+    public function uploadAttachments(int $taskId, array $files): AttachmentDto
     {
-        $data = $this->http->post("task/$taskId/attachments", ['multipart' => $files])->json();
-        return AttachmentDto::fromArray($data);
+        $response = $this->client->request('POST', "task/{$taskId}/attachments", [
+            'multipart' => $this->prepareFiles($files)
+        ]);
+
+        return AttachmentDto::fromArray($response);
     }
 
     public function sendMessage(int $taskId, array $data): MessageDto
     {
-        $response = $this->http->post("task/$taskId/message", [
+        $response = $this->client->request('POST', "task/{$taskId}/message", [
             'multipart' => $this->prepareMultipart($data)
-        ])->json();
+        ]);
 
         return MessageDto::fromArray($response);
     }
