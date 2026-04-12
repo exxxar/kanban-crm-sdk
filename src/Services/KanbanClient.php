@@ -3,34 +3,62 @@
 namespace Exxxar\Kanban\Services;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 
 class KanbanClient
 {
-    protected Client $http;
+    protected ?Client $http = null;
 
-    protected string $token;
     protected string $baseUrl;
+    protected ?string $token;
 
-    public function __construct($baseUrl, $token = null)
+    public function __construct(string $baseUrl, ?string $token = null)
     {
         $this->baseUrl = $baseUrl;
         $this->token = $token;
     }
 
-    protected function prepareClient(){
+    protected function getClient(): Client
+    {
+        if ($this->http) {
+            return $this->http;
+        }
+
+        $headers = [
+            'Accept' => 'application/json',
+        ];
+
+        if ($this->token) {
+            $headers['Authorization'] = "Bearer {$this->token}";
+        }
 
         $this->http = new Client([
-            'base_uri' => $this->baseUrl,
-            'headers' => [
-                'Accept' => 'application/json',
-                'Authorization' => $this->token ? "Bearer $this->token" : null,
-            ]
+            'base_uri' => rtrim($this->baseUrl, '/') . '/',
+            'headers' => $headers,
         ]);
+
+        return $this->http;
     }
 
-    public function setToken($token){
+    // 🔥 единый helper для json
+    public function request(string $method, string $uri, array $options = []): array
+    {
+        try {
+            $response = $this->getClient()->request($method, $uri, $options);
 
+            return json_decode($response->getBody()->getContents(), true);
+        } catch (GuzzleException $e) {
+            return [
+                'success' => false,
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
+
+    public function setToken(string $token): static
+    {
         $this->token = $token;
+        $this->http = null; // сброс клиента
         return $this;
     }
 
@@ -39,27 +67,25 @@ class KanbanClient
         return $this;
     }
 
-    public function tasks()
+    // --- сервисы ---
+
+    public function tasks(): Tasks
     {
-        $this->prepareClient();
-        return new Tasks($this->http);
+        return new Tasks($this);
     }
 
-    public function comments()
+    public function comments(): Comments
     {
-        $this->prepareClient();
-        return new Comments($this->http);
+        return new Comments($this);
     }
 
-    public function attachments()
+    public function attachments(): Attachments
     {
-        $this->prepareClient();
-        return new Attachments($this->http);
+        return new Attachments($this);
     }
 
-    public function boards()
+    public function boards(): Boards
     {
-        $this->prepareClient();
-        return new Boards($this->http);
+        return new Boards($this);
     }
 }
