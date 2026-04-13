@@ -11,7 +11,7 @@ class TaskDto
         public ?int $column_id,
         public string $title,
         public ?string $description,
-        public ?int $priority,
+        public ?string $priority,
         public ?Carbon $due_date,
         public ?Carbon $last_viewed_at,
         public array $labels,
