@@ -17,7 +17,7 @@ class Comments
     {
         $data = $this->client->request('GET', "task/{$taskId}/comments");
 
-        return TaskCommentDto::collection($data);
+        return TaskCommentDto::collection($data["comments"] ?? []);
     }
 
     public function add(int $taskId, array $data): TaskCommentDto
@@ -26,7 +26,7 @@ class Comments
             'multipart' => $this->prepareMultipart($data)
         ]);
 
-        return TaskCommentDto::fromArray($response);
+        return TaskCommentDto::fromArray($response["comments"] ?? []);
     }
 
     protected function prepareMultipart(array $data): array

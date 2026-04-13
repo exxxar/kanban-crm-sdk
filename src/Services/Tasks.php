@@ -19,7 +19,7 @@ class Tasks
             'json' => $data
         ]);
 
-        return TaskDto::fromArray($response);
+        return TaskDto::fromArray($response["task"] ?? []);
     }
 
     /**
@@ -39,14 +39,14 @@ class Tasks
     {
         $data = $this->client->request('GET', "task/{$taskId}");
 
-        return TaskDto::fromArray($data);
+        return TaskDto::fromArray($data["task"] ?? []);
     }
 
     public function comments(int $taskId): array
     {
         $data = $this->client->request('GET', "task/{$taskId}/comments");
 
-        return TaskCommentDto::collection($data);
+        return TaskCommentDto::collection($data["comments"] ?? []);
     }
 
     public function addComment(int $taskId, array $data): TaskCommentDto
@@ -55,23 +55,23 @@ class Tasks
             'multipart' => $this->prepareMultipart($data)
         ]);
 
-        return TaskCommentDto::fromArray($response);
+        return TaskCommentDto::fromArray($response["comment"] ?? []);
     }
 
     public function attachments(int $taskId): array
     {
         $data = $this->client->request('GET', "task/{$taskId}/attachments");
 
-        return AttachmentDto::collection($data);
+        return AttachmentDto::collection($data["attachments"] ?? []);
     }
 
-    public function uploadAttachments(int $taskId, array $files): AttachmentDto
+    public function uploadAttachments(int $taskId, array $files): array
     {
         $response = $this->client->request('POST', "task/{$taskId}/attachments", [
             'multipart' => $this->prepareFiles($files)
         ]);
 
-        return AttachmentDto::fromArray($response);
+        return AttachmentDto::collection($response["attachments"] ?? []);
     }
 
     public function sendMessage(int $taskId, array $data): MessageDto
@@ -80,7 +80,7 @@ class Tasks
             'multipart' => $this->prepareMultipart($data)
         ]);
 
-        return MessageDto::fromArray($response);
+        return MessageDto::fromArray($response["message"]);
     }
 
     // 🔧 helpers

@@ -17,7 +17,7 @@ class Attachments
     {
         $data = $this->client->request('GET', "task/{$taskId}/attachments");
 
-        return AttachmentDto::collection($data);
+        return AttachmentDto::collection($data["attachments"] ?? []);
     }
 
     /**
@@ -29,7 +29,7 @@ class Attachments
             'multipart' => $this->prepareFiles($files)
         ]);
 
-        return AttachmentDto::collection($data);
+        return AttachmentDto::collection($data["attachments"] ?? []);
     }
 
     protected function prepareFiles(array $files): array

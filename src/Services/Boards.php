@@ -14,7 +14,7 @@ class Boards
     {
         $data = $this->client->request('GET', "boards/{$uuid}");
 
-        return BoardDto::fromArray($data);
+        return BoardDto::fromArray($data["board"] ?? []);
     }
 
     /**
@@ -24,7 +24,7 @@ class Boards
     {
         $data = $this->client->request('GET', "boards");
 
-        return BoardDto::collection($data);
+        return BoardDto::collection($data["boards"] ?? []);
     }
 
     public function applyTemplate(string $uuid, string $template): BoardDto
@@ -33,6 +33,6 @@ class Boards
             'json' => ['template' => $template]
         ]);
 
-        return BoardDto::fromArray($data);
+        return BoardDto::fromArray($data["board"] ?? []);
     }
 }
