@@ -2,26 +2,29 @@
 
 namespace Exxxar\Kanban\Enums;
 
-use Exxxar\Kanban\Services\KanbanClient;
-
-
-enum KanbanTaskTypeEnum: int
+enum TaskTypeEnum: int
 {
-    case USER = 1;
-    case ORDER = 2;
-    case TEXT = 3;
-    case FINANCE = 4;
-    case DEVELOPMENT = 5;
+    case TASK = 1;        // Обычная задача
+    case CLIENT = 2;      // Клиент
+    case TEXT = 3;        // Текст
+    case FINANCE = 4;     // Финансы
+    case DEVELOPMENT = 5; // Разработка
+    case ORDER = 6;       // Заказ
 
     public function label(): string
     {
         return match($this) {
-            self::USER => 'user',
-            self::ORDER => 'order',
-            self::TEXT => 'text',
-            self::FINANCE => 'finance',
-            self::DEVELOPMENT => 'development',
+            self::TASK => 'Задача',
+            self::CLIENT => 'Клиент',
+            self::TEXT => 'Текст',
+            self::FINANCE => 'Финансы',
+            self::DEVELOPMENT => 'Разработка',
+            self::ORDER => 'Заказ',
         };
     }
 
+    public function isClient(): bool
+    {
+        return $this === self::CLIENT;
+    }
 }

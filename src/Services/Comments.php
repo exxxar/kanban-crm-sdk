@@ -11,47 +11,62 @@ class Comments
     }
 
     /**
+     * Получить комментарии задачи
+     *
      * @return TaskCommentDto[]
      */
     public function list(int $taskId): array
     {
-        $data = $this->client->request('GET', "task/{$taskId}/comments");
-
-        return TaskCommentDto::collection($data["comments"] ?? []);
+        $data = $this->client->request('GET', "tasks/{$taskId}/comments");
+        return TaskCommentDto::collection($data['comments'] ?? []);
     }
 
-    public function add(int $taskId, array $data): TaskCommentDto
+    /**
+     * Добавить комментарий
+     */
+    public function add(int $taskId, string $text, ?string $author = null, array $files = []): TaskCommentDto
     {
-        $response = $this->client->request('POST', "task/{$taskId}/comment", [
-            'multipart' => $this->prepareMultipart($data)
-        ]);
+        $multipart = [
+            ['name' => 'text', 'contents' => $text],
+        ];
 
-        return TaskCommentDto::fromArray($response["comments"] ?? []);
-    }
+        if ($author) {
+            $multipart[] = ['name' => 'author', 'contents' => $author];
+        }
 
-    protected function prepareMultipart(array $data): array
-    {
-        $multipart = [];
-
-        foreach ($data as $key => $value) {
-            if ($key === 'files') continue;
-
+        foreach ($files as $file) {
             $multipart[] = [
-                'name' => $key,
-                'contents' => $value
+                'name' => 'files[]',
+                'contents' => fopen($file, 'r'),
+                'filename' => basename($file),
             ];
         }
 
-        if (isset($data['files'])) {
-            foreach ($data['files'] as $file) {
-                $multipart[] = [
-                    'name' => 'files[]',
-                    'contents' => fopen($file, 'r'),
-                    'filename' => basename($file),
-                ];
-            }
-        }
+        $response = $this->client->request('POST', "tasks/{$taskId}/comments", [
+            'multipart' => $multipart,
+        ]);
 
-        return $multipart;
+        return TaskCommentDto::fromArray($response['comment'] ?? []);
+    }
+
+    /**
+     * Обновить комментарий
+     */
+    public function update(int $commentId, string $text): TaskCommentDto
+    {
+        $response = $this->client->request('PUT', "comments/{$commentId}", [
+            'json' => ['text' => $text],
+        ]);
+
+        return TaskCommentDto::fromArray($response['comment'] ?? []);
+    }
+
+    /**
+     * Удалить комментарий
+     */
+    public function delete(int $commentId): bool
+    {
+        $this->client->request('DELETE', "comments/{$commentId}");
+        return true;
     }
 }

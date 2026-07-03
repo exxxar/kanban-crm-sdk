@@ -10,13 +10,10 @@ class BoardDto
         public string $title,
         public ?string $description,
         public array $config,
-
         /** @var ColumnDto[] */
         public array $columns,
-
         /** @var TaskDto[] */
         public array $tasks,
-
         /** @var TagDto[] */
         public array $tags,
     ) {}
@@ -24,24 +21,21 @@ class BoardDto
     public static function fromArray(array $data): self
     {
         return new self(
-            id: $data['id'] ?? null,
-            uuid: $data['uuid'],
-            title: $data['title'],
+            id: $data['id'] ?? 0,
+            uuid: $data['uuid'] ?? '',
+            title: $data['title'] ?? '',
             description: $data['description'] ?? null,
             config: $data['config'] ?? [],
-
             columns: array_map(
-                fn ($col) => ColumnDto::fromArray($col),
+                fn($col) => ColumnDto::fromArray($col),
                 $data['columns'] ?? []
             ),
-
             tasks: array_map(
-                fn ($task) => TaskDto::fromArray($task),
+                fn($task) => TaskDto::fromArray($task),
                 $data['tasks'] ?? []
             ),
-
             tags: array_map(
-                fn ($tag) => TagDto::fromArray($tag),
+                fn($tag) => TagDto::fromArray($tag),
                 $data['tags'] ?? []
             ),
         );
@@ -52,9 +46,6 @@ class BoardDto
      */
     public static function collection(array $items): array
     {
-        return array_map(
-            fn ($item) => self::fromArray($item),
-            $items
-        );
+        return array_map(fn($item) => self::fromArray($item), $items);
     }
 }
